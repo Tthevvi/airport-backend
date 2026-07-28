@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    container_name: airport_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: airport
+      POSTGRES_USER: airport_user
+      POSTGRES_PASSWORD: airport_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - airport_pgdata:/var/lib/postgresql/data
+
+volumes:
+  airport_pgdata:
