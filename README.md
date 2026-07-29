@@ -8,8 +8,7 @@
 ## 1.2. Разворачиваем окружение
 
 ```bash
-# создаём папку проекта и виртуальное окружение
-mkdir airport-backend && cd airport-backend
+# создаём виртуальное окружение
 python3 -m venv venv
 
 # активируем venv
@@ -21,22 +20,19 @@ pip install -r requirements.txt
 ```
 
 ## 1.3. Поднимаем PostgreSQL в Docker
-
-Положите `docker-compose.yml` в корень проекта и запустите:
+Запустите:
 
 ```bash
 docker compose up -d
 docker compose ps        # убедиться, что airport_db запущен
 ```
 
-Это поднимет PostgreSQL на `localhost:5432` с базой `airport` — тем самым мы уже выполняем рекомендацию задания "ознакомиться с Docker".
-
+Это поднимет PostgreSQL на `localhost:5432` с базой `airport`
 ## 1.4. Создаём Django-проект
 
 ```bash
 django-admin startproject config .
 ```
-
 Это создаст:
 ```
 airport-backend/
@@ -62,7 +58,6 @@ python manage.py startapp shifts       # Shift
 python manage.py startapp refunds      # Refund
 python manage.py startapp audit        # AuditLog
 ```
-
 Итоговая структура:
 ```
 airport-backend/
@@ -70,7 +65,7 @@ airport-backend/
 ├── requirements.txt
 ├── docker-compose.yml
 ├── .env / .env.example
-├── config/            ← настройки проекта
+├── config/            
 ├── accounts/
 ├── references/
 ├── flights/
@@ -110,7 +105,3 @@ git add .
 git commit -m "chore: инициализация проекта, окружение, приложения"
 ```
 
-Дальше пушим на codelab.tpu.ru — это и будет первый "промежуточный результат в системе контроля версий", который просит задание.
-
----
-**Следующий шаг (2):** переносим диаграмму классов в `models.py` для каждого приложения.

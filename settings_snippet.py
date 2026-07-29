@@ -1,4 +1,4 @@
-# === Вставить/заменить соответствующие блоки в config/settings.py ===
+# === Заменить соответствующие блоки в config/settings.py ===
 
 import environ
 from pathlib import Path
