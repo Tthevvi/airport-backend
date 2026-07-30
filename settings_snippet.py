@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "drf_spectacular",
 
     # наши приложения (по одному на сервис из компонентной диаграммы)
+    "rest_framework.authtoken",
     "accounts",
     "references",
     "flights",
