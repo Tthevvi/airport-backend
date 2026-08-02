@@ -89,19 +89,11 @@ airport-backend/
 python manage.py migrate      # применит только встроенные миграции Django, пока без наших моделей
 python manage.py runserver
 ```
-
-Откройте http://127.0.0.1:8000 — должна открыться стартовая страница Django. Если открылась — окружение готово.
-
 ## 1.8. Git
 
 ```bash
 git init
-echo "venv/
-__pycache__/
-*.pyc
-.env
-db.sqlite3" > .gitignore
 git add .
-git commit -m "chore: инициализация проекта, окружение, приложения"
+git commit -m "комментарий"
 ```
 
