@@ -26,23 +26,10 @@ pip install -r requirements.txt
 docker compose up -d
 docker compose ps        # убедиться, что airport_db запущен
 ```
-
-Это поднимет PostgreSQL на `localhost:5432` с базой `airport`
 ## 1.4. Создаём Django-проект
 
 ```bash
 django-admin startproject config .
-```
-Это создаст:
-```
-airport-backend/
-├── manage.py
-└── config/
-    ├── __init__.py
-    ├── settings.py
-    ├── urls.py
-    ├── asgi.py
-    └── wsgi.py
 ```
 
 ## 1.5. Создаём приложения (по одному на каждый сервис из компонентной диаграммы)
@@ -58,38 +45,13 @@ python manage.py startapp shifts       # Shift
 python manage.py startapp refunds      # Refund
 python manage.py startapp audit        # AuditLog
 ```
-Итоговая структура:
-```
-airport-backend/
-├── manage.py
-├── requirements.txt
-├── docker-compose.yml
-├── .env / .env.example
-├── config/            
-├── accounts/
-├── references/
-├── flights/
-├── passengers/
-├── bookings/
-├── payments/
-├── shifts/
-├── refunds/
-└── audit/
-```
-
-Каждое приложение — это модуль из нашей компонентной диаграммы: в нём будут `models.py` (шаг 2), `serializers.py` и `views.py` (шаг 4).
-
-## 1.6. Настраиваем `config/settings.py`
-
-Замените блок `INSTALLED_APPS` и `DATABASES` (полный файл — `settings_snippet.py` рядом, скопируйте нужные куски).
-
-## 1.7. Проверяем, что всё работает
+## 1.6. Проверяем, что всё работает
 
 ```bash
 python manage.py migrate      # применит только встроенные миграции Django, пока без наших моделей
 python manage.py runserver
 ```
-## 1.8. Git
+## 1.7. Git
 
 ```bash
 git init
