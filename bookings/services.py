@@ -39,3 +39,30 @@ class BookingService:
             total_price=total_price,
         )
         return booking
+    @staticmethod
+    @transaction.atomic
+    def transfer_booking(*, booking, new_flight, new_seat_id):
+        if booking.status == Booking.Status.CANCELLED:
+            raise ValidationError("Нельзя перенести отменённую бронь.")
+        if new_flight.is_departed():
+            raise ValidationError("Нельзя перенести на рейс, который уже вылетел.")
+
+        new_seat = Seat.objects.select_for_update().get(id=new_seat_id, flight=new_flight)
+        if not new_seat.is_free():
+            raise ValidationError("Выбранное место на новом рейсе уже занято.")
+
+        old_seat = booking.seat
+        old_status = booking.status
+
+        old_seat.release()
+
+        new_seat.status = Seat.Status.SOLD if old_status == Booking.Status.CONFIRMED else Seat.Status.BLOCKED
+        if new_seat.status == Seat.Status.BLOCKED:
+            new_seat.block(booking.cashier)
+        else:
+            new_seat.save()
+
+        booking.flight = new_flight
+        booking.seat = new_seat
+        booking.save()
+        return booking

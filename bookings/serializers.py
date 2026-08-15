@@ -15,3 +15,7 @@ class BookingSerializer(serializers.ModelSerializer):
         model = Booking
         fields = "__all__"
         read_only_fields = ["booking_number", "status", "total_price", "created_at"]
+        
+class BookingTransferSerializer(serializers.Serializer):
+    new_flight_id = serializers.IntegerField()
+    new_seat_id = serializers.IntegerField()
