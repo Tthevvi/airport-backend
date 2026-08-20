@@ -3,6 +3,7 @@ from rest_framework.response import Response
 
 from bookings.models import Booking
 from shifts.models import Shift
+from config.utils import get_object_or_400
 from .models import Payment
 from .serializers import PaymentSerializer, PaymentCreateSerializer
 from .services import PaymentService
@@ -18,8 +19,8 @@ class PaymentViewSet(viewsets.ModelViewSet):
         input_serializer.is_valid(raise_exception=True)
         data = input_serializer.validated_data
 
-        booking = Booking.objects.get(id=data["booking_id"])
-        shift = Shift.objects.get(id=data["shift_id"])
+        booking = get_object_or_400(Booking, id=data["booking_id"])
+        shift = get_object_or_400(Shift, id=data["shift_id"])
 
         payment = PaymentService.pay_booking(booking=booking, shift=shift, method=data["method"])
         return Response(PaymentSerializer(payment).data, status=status.HTTP_201_CREATED)

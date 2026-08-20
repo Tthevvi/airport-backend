@@ -1,5 +1,5 @@
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
-from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
 from flights.models import Seat
@@ -10,9 +10,10 @@ class BookingService:
     @staticmethod
     @transaction.atomic
     def create_booking(*, flight, passenger, seat_id, tariff, cashier, baggage_weight_kg=0):
-        # select_for_update блокирует строку места в БД до конца транзакции —
-        # это и есть защита от одновременного бронирования одного места двумя кассирами
-        seat = Seat.objects.select_for_update().get(id=seat_id, flight=flight)
+        try:
+            seat = Seat.objects.select_for_update().get(id=seat_id, flight=flight)
+        except ObjectDoesNotExist:
+            raise ValidationError("Указанное место не найдено на этом рейсе.")
 
         if not seat.is_free():
             raise ValidationError("Это место уже занято или временно заблокировано другим кассиром.")
@@ -39,15 +40,21 @@ class BookingService:
             total_price=total_price,
         )
         return booking
+
     @staticmethod
     @transaction.atomic
     def transfer_booking(*, booking, new_flight, new_seat_id):
         if booking.status == Booking.Status.CANCELLED:
             raise ValidationError("Нельзя перенести отменённую бронь.")
+
         if new_flight.is_departed():
             raise ValidationError("Нельзя перенести на рейс, который уже вылетел.")
 
-        new_seat = Seat.objects.select_for_update().get(id=new_seat_id, flight=new_flight)
+        try:
+            new_seat = Seat.objects.select_for_update().get(id=new_seat_id, flight=new_flight)
+        except ObjectDoesNotExist:
+            raise ValidationError("Указанное место не найдено на новом рейсе.")
+
         if not new_seat.is_free():
             raise ValidationError("Выбранное место на новом рейсе уже занято.")
 

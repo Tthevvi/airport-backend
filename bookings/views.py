@@ -2,15 +2,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.exceptions import ValidationError
 
 from flights.models import Flight
 from passengers.models import Passenger
 from references.models import Tariff
+from config.utils import get_object_or_400
 from .models import Booking
-from .serializers import BookingSerializer, BookingCreateSerializer
-from .services import BookingService
 from .serializers import BookingSerializer, BookingCreateSerializer, BookingTransferSerializer
+from .services import BookingService
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.select_related("flight", "passenger", "seat", "tariff", "cashier").all()
@@ -22,12 +21,9 @@ class BookingViewSet(viewsets.ModelViewSet):
         input_serializer.is_valid(raise_exception=True)
         data = input_serializer.validated_data
 
-        try:
-            flight = Flight.objects.get(id=data["flight_id"])
-            passenger = Passenger.objects.get(id=data["passenger_id"])
-            tariff = Tariff.objects.get(id=data["tariff_id"])
-        except ObjectDoesNotExist as exc:
-            raise ValidationError(f"Не найдена связанная запись: {exc}")
+        flight = get_object_or_400(Flight, id=data["flight_id"])
+        passenger = get_object_or_400(Passenger, id=data["passenger_id"])
+        tariff = get_object_or_400(Tariff, id=data["tariff_id"])
 
         booking = BookingService.create_booking(
             flight=flight,
@@ -37,8 +33,8 @@ class BookingViewSet(viewsets.ModelViewSet):
             cashier=request.user,
             baggage_weight_kg=data["baggage_weight_kg"],
         )
-        output_serializer = BookingSerializer(booking)
-        return Response(output_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(BookingSerializer(booking).data, status=status.HTTP_201_CREATED)
+
 
     @action(detail=True, methods=["post"])
     def cancel(self, request, pk=None):
