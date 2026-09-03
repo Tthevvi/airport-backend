@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 from bookings.models import Booking
 from shifts.models import Shift
 from .models import Payment
+from audit.services import log_action
 
 
 class PaymentService:
@@ -24,4 +25,5 @@ class PaymentService:
             fiscal_receipt_no=f"FR-{uuid.uuid4().hex[:10].upper()}",
         )
         booking.confirm()
+        log_action(shift.cashier, "payment_created", payment, f"Сумма: {payment.amount}")
         return payment

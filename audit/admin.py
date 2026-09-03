@@ -1,3 +1,9 @@
 from django.contrib import admin
+from .models import AuditLog
 
-# Register your models here.
+
+@admin.register(AuditLog)
+class AuditLogAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "user", "action", "object_repr")
+    list_filter = ("action",)
+    readonly_fields = ("user", "action", "object_repr", "details", "created_at")

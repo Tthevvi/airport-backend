@@ -4,6 +4,7 @@ from rest_framework.exceptions import ValidationError
 
 from flights.models import Seat
 from .models import Booking
+from audit.services import log_action
 
 
 class BookingService:
@@ -39,6 +40,7 @@ class BookingService:
             baggage_weight_kg=baggage_weight_kg,
             total_price=total_price,
         )
+        log_action(cashier, "booking_created", booking)
         return booking
 
     @staticmethod
@@ -72,4 +74,5 @@ class BookingService:
         booking.flight = new_flight
         booking.seat = new_seat
         booking.save()
+        log_action(booking.cashier, "booking_transferred", booking, f"Новый рейс: {new_flight}")
         return booking

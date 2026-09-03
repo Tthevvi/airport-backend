@@ -17,7 +17,7 @@ class Booking(models.Model):
     booking_number = models.CharField(max_length=20, unique=True, editable=False, verbose_name="Номер брони")
     flight = models.ForeignKey(Flight, on_delete=models.PROTECT, related_name="bookings")
     passenger = models.ForeignKey(Passenger, on_delete=models.PROTECT, related_name="bookings")
-    seat = models.OneToOneField(Seat, on_delete=models.PROTECT, related_name="booking")
+    seat = models.ForeignKey(Seat, on_delete=models.PROTECT, related_name="bookings")
     tariff = models.ForeignKey(Tariff, on_delete=models.PROTECT, related_name="bookings")
     cashier = models.ForeignKey(Cashier, on_delete=models.PROTECT, related_name="bookings")
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
@@ -29,6 +29,13 @@ class Booking(models.Model):
         verbose_name = "Бронирование"
         verbose_name_plural = "Бронирования"
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["seat"],
+                condition=models.Q(status__in=["pending", "confirmed"]),
+                name="unique_active_booking_per_seat",
+            )
+        ]
 
     def __str__(self):
         return f"Бронь {self.booking_number} ({self.passenger})"

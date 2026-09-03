@@ -10,6 +10,7 @@ from config.utils import get_object_or_400
 from .models import Booking
 from .serializers import BookingSerializer, BookingCreateSerializer, BookingTransferSerializer
 from .services import BookingService
+from audit.services import log_action
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.select_related("flight", "passenger", "seat", "tariff", "cashier").all()
@@ -53,4 +54,10 @@ class BookingViewSet(viewsets.ModelViewSet):
         booking = BookingService.transfer_booking(
             booking=booking, new_flight=new_flight, new_seat_id=data["new_seat_id"]
         )
+        return Response(BookingSerializer(booking).data)
+    @action(detail=True, methods=["post"])
+    def cancel(self, request, pk=None):
+        booking = self.get_object()
+        booking.cancel()
+        log_action(request.user, "booking_cancelled", booking)
         return Response(BookingSerializer(booking).data)

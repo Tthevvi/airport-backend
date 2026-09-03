@@ -5,6 +5,7 @@ from rest_framework.exceptions import ValidationError
 
 from bookings.models import Booking
 from .models import Refund
+from audit.services import log_action
 
 
 class RefundService:
@@ -35,4 +36,6 @@ class RefundService:
             penalty_amount=penalty,
             refund_amount=refund_amount,
         )
+        refund = Refund.objects.create(...)
+        log_action(cashier, "refund_created", refund, f"Штраф: {refund.penalty_amount}")
         return refund
