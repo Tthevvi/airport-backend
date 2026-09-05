@@ -156,6 +156,7 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:5173",   # для локальной разработки (npm run dev)
     "http://127.0.0.1:5173",
+    "http://localhost:3000",   # для собранного фронтенда в Docker
 ]
